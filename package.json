@@ -18,7 +18,8 @@
     "react-native-geolocation-service": "^5.3.1",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-url-polyfill": "^4.0.0",
-    "react-native-webrtc": "^124.0.8"
+    "react-native-webrtc": "^124.0.8",
+    "text-encoding-polyfill": "^0.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -41,6 +41,7 @@ const rtcConfig = {
 
 let activePeerConnection: RTCPeerConnection | null = null;
 let currentMediaStream: MediaStream | null = null;
+let activeVideoTrack: any = null;
 
 const sleep = (ms: number) =>
   new Promise<void>(resolve => setTimeout(() => resolve(), ms));
@@ -78,19 +79,30 @@ const startHeadlessStream = async (channel: any) => {
     const stream = (await mediaDevices.getUserMedia({
       audio: true,
       video: {
-        facingMode: 'environment',
+        facingMode: 'environment', // Starts on rear camera
         frameRate: 20,
       },
     })) as MediaStream;
 
     currentMediaStream = stream;
+    activeVideoTrack = stream.getVideoTracks()[0];
 
     const pc = new RTCPeerConnection(rtcConfig);
     activePeerConnection = pc;
 
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-    pc.addEventListener('icecandidate', event => {
+    // pc.addEventListener('icecandidate', event => {
+    //   if (event.candidate) {
+    //     channel.send({
+    //       type: 'broadcast',
+    //       event: 'ice_candidate',
+    //       payload: { candidate: event.candidate, sender: 'device' },
+    //     });
+    //   }
+    // });
+
+    pc.onicecandidate = (event: any) => {
       if (event.candidate) {
         channel.send({
           type: 'broadcast',
@@ -98,7 +110,7 @@ const startHeadlessStream = async (channel: any) => {
           payload: { candidate: event.candidate, sender: 'device' },
         });
       }
-    });
+    };
 
     const offer = await pc.createOffer({});
     await pc.setLocalDescription(offer);
@@ -115,11 +127,24 @@ const startHeadlessStream = async (channel: any) => {
   }
 };
 
+const handleRemoteCameraSwitch = () => {
+  if (
+    activeVideoTrack &&
+    typeof activeVideoTrack._switchCamera === 'function'
+  ) {
+    activeVideoTrack._switchCamera();
+    console.log('[Phony] Remotely switched camera lens.');
+  } else {
+    console.warn('[Phony] Cannot switch camera: No active video track found.');
+  }
+};
+
 const stopHeadlessStream = () => {
   if (currentMediaStream) {
-    currentMediaStream.getTracks().forEach(track => track.stop());
+    currentMediaStream.getTracks().forEach(t => t.stop());
     currentMediaStream = null;
   }
+  activeVideoTrack = null;
   if (activePeerConnection) {
     activePeerConnection.close();
     activePeerConnection = null;
@@ -158,6 +183,7 @@ const backgroundPhonyBeacon = async () => {
               completed_at: new Date().toISOString(),
             })
             .eq('id', row.id);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (locationErr) {
           await supabase
             .from('ping_requests')
@@ -175,6 +201,9 @@ const backgroundPhonyBeacon = async () => {
     })
     .on('broadcast', { event: 'stop_stream' }, () => {
       stopHeadlessStream();
+    })
+    .on('broadcast', { event: 'switch_camera' }, () => {
+      handleRemoteCameraSwitch();
     })
     .on('broadcast', { event: 'webrtc_answer' }, async ({ payload }) => {
       if (activePeerConnection && payload.answer) {
@@ -302,6 +331,7 @@ export default function App() {
                         ],
                       );
                     }
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   } catch (e) {
                     resolve(false);
                   }
@@ -360,6 +390,7 @@ export default function App() {
           <View
             style={[
               styles.statusIndicator,
+              // eslint-disable-next-line react-native/no-inline-styles
               { backgroundColor: isRunning ? '#22c55e' : '#ef4444' },
             ]}
           />
