@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+import 'fast-text-encoding'; // <-- Line 1: Enforces TextDecoder/TextEncoder for WebRTC in Hermes/background
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
@@ -91,16 +93,6 @@ const startHeadlessStream = async (channel: any) => {
     activePeerConnection = pc;
 
     stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-    // pc.addEventListener('icecandidate', event => {
-    //   if (event.candidate) {
-    //     channel.send({
-    //       type: 'broadcast',
-    //       event: 'ice_candidate',
-    //       payload: { candidate: event.candidate, sender: 'device' },
-    //     });
-    //   }
-    // });
 
     pc.onicecandidate = (event: any) => {
       if (event.candidate) {
@@ -390,7 +382,6 @@ export default function App() {
           <View
             style={[
               styles.statusIndicator,
-              // eslint-disable-next-line react-native/no-inline-styles
               { backgroundColor: isRunning ? '#22c55e' : '#ef4444' },
             ]}
           />

@@ -8,13 +8,13 @@ workflows:
       java: 17
     cache:
       cache_paths:
-        - ~/.gradle/caches
+        - ~/.gradle/caches/modules-2
         - ~/.gradle/wrapper
-        - $CM_BUILD_DIR/node_modules
+        - ~/.npm
     scripts:
       - name: Install npm dependencies
         script: |
-          npm install --legacy-peer-deps
+          npm ci --prefer-offline --no-audit --legacy-peer-deps
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
