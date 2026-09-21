@@ -24,7 +24,9 @@ const DEVICE_ID = 'phony-device';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+// const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms: number) =>
+  new Promise<void>(resolve => setTimeout(() => resolve(), ms));
 
 // Helper: Query current GPS fix via Promise
 const getDevicePosition = (): Promise<Geolocation.GeoPosition> => {
@@ -177,7 +179,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#020617" />
+      <StatusBar barStyle="light-content" />
       <View style={styles.card}>
         <Text style={styles.appName}>PHONY</Text>
         <Text style={styles.deviceIdLabel}>
@@ -188,6 +190,7 @@ export default function App() {
           <View
             style={[
               styles.statusIndicator,
+              // eslint-disable-next-line react-native/no-inline-styles
               { backgroundColor: isRunning ? '#22c55e' : '#ef4444' },
             ]}
           />
