@@ -2,7 +2,7 @@ workflows:
   react-native-android:
     name: Phony Android Debug Build
     max_build_duration: 30
-    instance_type: mac_mini_m1 # Codemagic standard free runner
+    instance_type: mac_mini_m1
     environment:
       node: 20
       java: 17
@@ -13,10 +13,21 @@ workflows:
       - name: Set Android SDK location
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
+      - name: Create asset directory
+        script: |
+          mkdir -p android/app/src/main/assets
+      - name: Generate Offline JS Bundle
+        script: |
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
       - name: Make Gradle executable
         script: |
           chmod +x android/gradlew
-      - name: Build Android Debug APK
+      - name: Build Android Standalone APK
         script: |
           cd android
           ./gradlew assembleDebug --no-daemon
@@ -25,7 +36,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - your-email@example.com # Replace with your email to get download link
+          - git.mhd@gmail.com
         notify:
           failure: true
           success: true
