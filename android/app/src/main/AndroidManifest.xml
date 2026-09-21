@@ -7,9 +7,19 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Optional Camera Features -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
         android:name=".MainApplication"
@@ -19,10 +29,10 @@
         android:allowBackup="false"
         android:theme="@style/AppTheme">
 
-        <!-- Force the library service to use location type -->
+        <!-- Foreground Service Types for Headless Execution -->
         <service
             android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask"
-            android:foregroundServiceType="location"
+            android:foregroundServiceType="location|camera|microphone"
             android:exported="false"
             tools:replace="android:foregroundServiceType" />
 
