@@ -32,7 +32,7 @@ workflows:
           cd android
           ./gradlew assembleDebug --no-daemon
     artifacts:
-      - android/app/build/outputs/apk/debug/app-debug.apk
+      - android/app/build/outputs/apk/debug/*.apk
     publishing:
       email:
         recipients:
